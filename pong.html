@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+        #player1score {
+            color: white;
+            position: absolute;
+            left: 850px;
+            top: 240px;
+            font-size: 25px;
+
+        }
+
+        #player2score {
+            color: white;
+            position: absolute;
+            right: 850px;
+            top: 240px;
+            font-size: 25px;
+
+        }
+    </style>
+</head>
+<body>
+<div id = "player1score">0</div>
+<div id = "player2score">0</div>
+<canvas width="400" height="400" id="game"></canvas>
+<script>
+
+    let canvas = document.getElementById('game');
+    let context = canvas.getContext('2d');
+    let grid = 16;
+    let player1Score = 0;
+    let player2Score = 0;
+    const speeds = [1, -1];
+    const range = Array.apply(null, {length: canvas.height}).map(Number.call, Number)
+
+    let player1 = {
+        x: 20,
+        y: 160,
+        width: 5,
+        height: 60,
+        speed: 2,
+
+        dy: 0,
+
+    };
+
+    let player2 = {
+        x: canvas.width - 30,
+        y: 160,
+
+        width: 5,
+        height: 60,
+        speed: 2,
+
+        dy: 0,
+    };
+
+    let ball = {
+
+        x: canvas.width/2,
+        y: canvas.height/2,
+        radius: 5,
+
+        dx: -1,
+        dy: -1,
+
+    }
+
+    function loop() {
+        requestAnimationFrame(loop);
+        context.clearRect(0,0,canvas.width,canvas.height);
+        context.fillStyle = 'green';
+
+        context.fillRect(player1.x, player1.y, player1.width, player1.height);
+        context.fillRect(player2.x, player2.y, player2.width, player2.height);
+        context.fillStyle = 'white';
+        context.beginPath();
+        context.arc(ball.x,ball.y,ball.radius,0,2*Math.PI);
+        context.fill();
+
+
+        keyInput(player1);
+        player1.y += player1.dy;
+        keyInput(player2);
+        player2.y += player2.dy;
+        checkCollision();
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+        score();
+    }
+
+    function keyInput() {
+        document.addEventListener('keydown', function(e) {
+
+
+            if (e.which === 87 && player1.y > 0) {
+                player1.dy = -player1.speed;
+            }
+
+            if (e.which === 83 && player1.y < 340) {
+                player1.dy = player1.speed;
+            }
+
+            if (e.which === 38 && player2.y > 0) {
+                player2.dy = -player2.speed;
+            }
+
+            if (e.which === 40 && player2.y < 340) {
+                player2.dy = player2.speed;
+
+            }
+
+
+        });
+
+    }
+
+    function checkCollision() {
+
+        if (player1.x < ball.x + 2*ball.radius &&
+            player1.x + player1.width > ball.x &&
+            player1.y < ball.y + 2*ball.radius &&
+            player1.height + player1.y > ball.y) {
+
+            ball.dx = -ball.dx;
+            ball.dy = ball.dy;
+        }
+
+        if (player2.x < ball.x + 2*ball.radius &&
+            player2.x + player2.width > ball.x &&
+            player2.y < ball.y + 2*ball.radius &&
+            player2.height + player2.y > ball.y) {
+
+            ball.dx = -ball.dx;
+            ball.dy = ball.dy;
+        }
+
+        if (ball.x < 0 || ball.x > canvas.width) {
+            ball.dx = -ball.dx;
+        }
+        if (ball.y < 0 || ball.y > canvas.height) {
+            ball.dy = -ball.dy;
+        }
+
+        if (player1.y <= 0 || player1.y >= 340) {
+            player1.dy = 0;
+        }
+
+        if (player2.y <= 0 || player2.y >= 340) {
+            player2.dy = 0;
+        }
+
+
+    }
+
+    function score() {
+
+        if (ball.x < 5) {
+            player2Score += 1;
+            ball.x = canvas.width/2;
+            ball.y = range[Math.floor(Math.random()*range.length)];
+            ball.dx = -1;
+            ball.dy = speeds[Math.floor(Math.random()*speeds.length)];
+
+        }
+        else if (ball.x > canvas.width -5){
+            player1Score +=1;
+            ball.x = canvas.width/2;
+            ball.y = range[Math.floor(Math.random()*range.length)];
+            ball.dx = 1;
+            ball.dy = speeds[Math.floor(Math.random()*speeds.length)];
+        }
+
+        document.getElementById("player1score").innerHTML = player1Score;
+        document.getElementById("player2score").innerHTML = player2Score;
+
+
+    }
+
+
+    requestAnimationFrame(loop);
+
+
+</script>
+</body>
+</html>
